@@ -1,0 +1,170 @@
+
+
+
+
+ create schema PS
+
+ create table product1
+ (productID int constraint productID_pkk primary key,
+ productName varchar(40) Not Null,
+supplierID int references supply(supplierID) Not Null,
+ )
+ go
+ create table supply
+ (supplierID int constraint supplierID_pkk primary key,
+ supplierName varchar(40) Not Null,
+ City varchar(30) Not Null,
+ )
+ go
+  
+ select*from supply
+ go
+ select*from product1
+ go
+ insert into supply
+ values(1,'ram','mumbai')
+ insert into supply
+ values(2,'sham','mumbai')
+ insert into supply
+ values(3,'raj','hyd')
+ go
+  insert into supply
+ values(4,'raju','bsp')
+ go
+  insert into supply
+ values(5,'raji','rpr')
+ go
+  insert into supply
+ values(6,'rakesh','hyd')
+ go
+ insert into product1
+ values(1,'data cable',1)
+insert into product1
+ values(2,'mobile',2)
+ insert into product1
+ values(3,'computer',3)
+ go
+ insert into product1
+ values(4,'pen drive',4)
+ go
+ use [Database]
+CREATE UNIQUE NONCLUSTERED INDEX
+u_prod_prodname
+on [Product1](ProductName,ProductID)
+ go
+
+ use NewDatabase
+ go
+ create view PS.supplyViews
+ as select
+ supplierID, supplierName
+ from supply where supplierName is not null
+ go
+ select *from PS.supplyViews
+ go
+ select*from supply
+ go
+
+
+ create procedure supplier_IP(@suppid int, @suppname varchar(40), @city varchar(30))
+ as 
+ begin
+	set @suppid =(select max(supplierID) from Supply)+1
+	insert into supply values(@suppid,@suppname,@city)
+	end
+
+ select *from supply
+ exec supplier_IP 199,'ajay','thane'
+ go
+
+ alter procedure supplier_IP(@suppid int out, @suppname varchar(40), @city varchar(30))
+ as 
+ begin
+ if @suppid=0
+	begin
+	set @suppid =(select max(supplierID) from Supply)+1
+	insert into supply values(@suppid,@suppname,@city)
+	end
+else
+	begin 
+	update Supply set supplierID=@suppid,supplierName=@suppname, city=@city where supplierID=@suppid
+	end
+end
+ select *from supply
+
+ declare @supid int
+ set @supid=4
+
+ exec supplier_IP @supid out,'vinay enterprises','thane'
+ select @supid
+ go
+
+ select *from supply
+ go
+
+
+ 
+ alter procedure supplier_IP(@suppid int out, @suppname varchar(40), @city varchar(30))
+ as 
+ begin
+
+
+ declare @i int,@tes varchar(20),@j int
+ set @j=0
+ begin try set @i=500/@j
+ end try  begin catch 
+ throw
+ return 0
+ end catch
+
+ if @suppid=''
+	begin
+select 'invalid'
+select *from supply
+return 0
+	end
+ select *from supply
+
+ declare @supid int
+ set @supid=0
+
+ exec supplier_IP @supid out,'vinay enterprises','thane'
+ select @supid
+ go
+
+ select *from supply
+ go
+
+ create procedure product_IP(@prodid int, @prodname varchar(40), @suppid int)
+ as 
+ begin
+	set @prodid =(select max(productID) from Product1)+1
+	insert into product1 values(@prodid,@prodname,@suppid)
+	end
+
+ select *from product1
+ exec product_IP 199,'ajay',4
+ go
+
+  alter procedure product_IP(@prodid int out, @prodname varchar(40), @suppid int )
+ as 
+ begin
+ if @prodid=0
+	begin
+	set @prodid =(select max(productID) from product1)+1
+	insert into supply values(@prodid,@prodname,@suppid)
+	end
+else
+	begin 
+	update product1 set productID=@prodid,productName=@prodname, supplierID=@suppid where productID=@prodid
+	end
+end
+ select *from product1
+ go
+
+ declare @proddid int
+ set @proddid=4
+
+ exec product_IP @proddid out,'vinay enterprises',3
+ select @proddid
+ go
